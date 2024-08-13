@@ -11,7 +11,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/nikolaydubina/go-instrument/instrument"
+	"github.com/MarketDataApp/go-instrument/instrument"
 	"github.com/nikolaydubina/go-instrument/processor"
 )
 
@@ -75,7 +75,7 @@ func process(fileName, app string, overwrite, defaultSelect, skipGenerated bool)
 	}
 	functionSelector := processor.NewMapFunctionSelectorFromCommands(defaultSelect, commands)
 
-	var instrumenter processor.Instrumenter = &instrument.OpenTelemetry{
+	var instrumenter processor.Instrumenter = &instrument.Sentry{
 		TracerName:  app,
 		ContextName: "ctx",
 		ErrorName:   "err",
