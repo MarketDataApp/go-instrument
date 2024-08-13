@@ -34,7 +34,7 @@ func (s *Sentry) PrefixStatements(spanName string, hasError bool) []ast.Stmt {
 		&ast.AssignStmt{
 			Tok: token.DEFINE,
 			Lhs: []ast.Expr{&ast.Ident{Name: s.ContextName}, &ast.Ident{Name: "tracer"}},
-			Rhs: []ast.Expr{s.expFuncSet(s.TracerName, spanName)},
+			Rhs: []ast.Expr{s.expFuncSet(spanName)},
 		},
 		&ast.DeferStmt{Call: &ast.CallExpr{
 			Fun: &ast.FuncLit{
@@ -54,7 +54,7 @@ func (s *Sentry) PrefixStatements(spanName string, hasError bool) []ast.Stmt {
 	return stmts
 }
 
-func (s *Sentry) expFuncSet(tracerName, spanName string) ast.Expr {
+func (s *Sentry) expFuncSet(spanName string) ast.Expr {
 	return &ast.CallExpr{
 		Fun: &ast.SelectorExpr{
 			X:   &ast.Ident{Name: "sentry"},
@@ -62,7 +62,7 @@ func (s *Sentry) expFuncSet(tracerName, spanName string) ast.Expr {
 		},
 		Args: []ast.Expr{
 			&ast.Ident{Name: s.ContextName},
-			&ast.BasicLit{Kind: token.STRING, Value: `"` + tracerName + `"`},
+			&ast.BasicLit{Kind: token.STRING, Value: `"` + s.TracerName + `"`},
 			&ast.BasicLit{Kind: token.STRING, Value: `"` + spanName + `"`},
 		},
 	}

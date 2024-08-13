@@ -12,31 +12,29 @@ import (
 	"os"
 
 	"github.com/MarketDataApp/go-instrument/instrument"
-	"github.com/nikolaydubina/go-instrument/processor"
+	"github.com/MarketDataApp/go-instrument/processor"
 )
 
 func main() {
 	var (
 		fileName      string
 		overwrite     bool
-		app           string
 		defaultSelect bool
 		skipGenerated bool
 	)
 	flag.StringVar(&fileName, "filename", "", "go file to instrument")
-	flag.StringVar(&app, "app", "app", "name of application")
 	flag.BoolVar(&overwrite, "w", false, "overwrite original file")
 	flag.BoolVar(&defaultSelect, "all", true, "instrument all by default")
 	flag.BoolVar(&skipGenerated, "skip-generated", false, "skip generated files")
 	flag.Parse()
 
-	if err := process(fileName, app, overwrite, defaultSelect, skipGenerated); err != nil {
+	if err := process(fileName, overwrite, defaultSelect, skipGenerated); err != nil {
 		os.Stderr.WriteString(err.Error())
 		os.Exit(1)
 	}
 }
 
-func process(fileName, app string, overwrite, defaultSelect, skipGenerated bool) error {
+func process(fileName string, overwrite, defaultSelect, skipGenerated bool) error {
 	if fileName == "" {
 		return errors.New("missing arg: file name")
 	}
@@ -75,8 +73,11 @@ func process(fileName, app string, overwrite, defaultSelect, skipGenerated bool)
 	}
 	functionSelector := processor.NewMapFunctionSelectorFromCommands(defaultSelect, commands)
 
+	// Extract package name
+	packageName := file.Name.Name
+
 	var instrumenter processor.Instrumenter = &instrument.Sentry{
-		TracerName:  app,
+		TracerName:  packageName,
 		ContextName: "ctx",
 		ErrorName:   "err",
 	}
